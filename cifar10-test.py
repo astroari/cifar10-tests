@@ -39,7 +39,24 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 
 datagen = ImageDataGenerator(width_shift_range=0.1, height_shift_range=0.1, horizontal_flip=True)
-aug_train = datagen.flow(train_images, train_labels, batch_size=32)
+#aug_train = datagen.flow(train_images, train_labels, batch_size=32)
+
+#visualise data augmentation
+#picking a single image to transform
+test_img = train_images[38]
+img = image.img_to_array(test_img)  # convert image to numpy arry
+img = img.reshape((1,) + img.shape)  # reshape image
+
+i = 0
+
+for batch in datagen.flow(img, save_prefix='test', save_format='jpeg'):  #this loops runs forever until we break
+    plt.figure(i)
+    plot = plt.imshow(image.img_to_array(batch[0]))
+    i += 1
+    if i > 3:  # show 3 images
+        break
+
+plt.show()
 
 #compile model
 model.compile(optimizer=tf.keras.optimizers.Adadelta(
@@ -47,8 +64,9 @@ model.compile(optimizer=tf.keras.optimizers.Adadelta(
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-history = model.fit(aug_train, epochs=10, 
-                    validation_data=(test_images, test_labels))
+history = model.fit(datagen.flow(train_images, train_labels, batch_size=B_S),
+                    validation_data=(test_images, test_labels), steps_per_epoch=len(train_images) // B_S,
+                    epochs=E)
 
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
