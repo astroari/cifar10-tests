@@ -22,14 +22,20 @@ for i in range(9):
 #model
 model = Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu', padding="same",  input_shape=(32, 32, 3)))
+model.add(layers.BatchNormalization())
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu', padding="same" ))
+model.add(layers.BatchNormalization())
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu', padding="same"))
+model.add(layers.BatchNormalization())
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(128, (3, 3), activation='relu', padding="same"))
+model.add(layers.BatchNormalization())
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Flatten())
 model.add(layers.Dense(64, activation='relu'))
-model.add(layers.Dropout(0.5))
+#model.add(layers.Dropout(0.5))
 model.add(layers.Dense(10))
 
 model.summary()
@@ -58,6 +64,9 @@ for batch in datagen.flow(img, save_prefix='test', save_format='jpeg'):  #this l
 
 plt.show()
 
+B_S = 32 #batch size
+E = 100 #epochs
+
 #compile model
 model.compile(optimizer=tf.keras.optimizers.Adadelta(
     learning_rate=1.0, rho=0.95, epsilon=1e-07),
@@ -67,6 +76,11 @@ model.compile(optimizer=tf.keras.optimizers.Adadelta(
 history = model.fit(datagen.flow(train_images, train_labels, batch_size=B_S),
                     validation_data=(test_images, test_labels), steps_per_epoch=len(train_images) // B_S,
                     epochs=E)
+
+#no augmentation version
+'''history = model.fit(train_images, train_labels, batch_size=B_S,
+                    validation_data=(test_images, test_labels),
+                    epochs=E)'''
 
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
