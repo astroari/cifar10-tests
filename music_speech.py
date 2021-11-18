@@ -107,7 +107,7 @@ for i in range(0, 4):
     num_filters = 2**(5 + i)
     x = Conv2D(num_filters, 3)(x)
     x = BatchNormalization()(x)
-    x = Activation("tanh")(x)
+    x = Activation("relu")(x)
     x = MaxPool2D(2)(x)
 x = Flatten()(x)
 x = Dropout(0.4)(x)
